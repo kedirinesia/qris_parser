@@ -37,7 +37,7 @@ Tambahkan ke `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  qris_parser: ^1.0.0
+  qris_parser: ^1.0.1
 ```
 
 Lalu jalankan:
