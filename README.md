@@ -1,133 +1,170 @@
-# QRIS Parser
+# QRIS Parser (Dart / Flutter)
 
-A Dart package for parsing QRIS (Quick Response Code Indonesian Standard) strings, based on the **EMVCo QR Code Specification for Payment Systems (EMV QRCPS)**.
+**QRIS Parser** adalah package Dart untuk mem-parsing string QRIS (EMVCo) menjadi data terstruktur, lengkap dengan validasi CRC, sehingga aman digunakan untuk aplikasi payment, PPOB, e-wallet, dan backend validation.
 
-This package enables you to break down a valid QRIS code into pieces of useful information, such as the merchant name, transaction amount, city, postal code, and validation status (CRC).
+Package ini dibuat khusus untuk developer Indonesia yang berurusan dengan QRIS, payment gateway, dan sistem pembayaran digital.
+
+---
 
 ## Features
 
-- **Standard Compliance**: Parses QRIS strings according to standard TLV (Tag-Length-Value) formatting.
-- **Data Extraction**: Easily access fields like Merchant Name, City, Postal Code, Currency, and Amount.
-- **CRC Validation**: Automatically verifies the CRC16-CCITT checksum to ensure data integrity.
-- **Nested Parsing**: Supports parsing of nested objects like Merchant Account Information (ID 26-51) and Additional Data Fields (ID 62).
-- **Pure Dart**: Zero dependencies on Flutter, meaning it runs on server-side Dart, CLIs, and generic web apps too.
+- Parse QRIS string ke struktur data
+- Validasi CRC (EMVCo compliant)
+- Support QRIS statis dan dinamis
+- Compatible dengan Flutter dan Dart backend
+- Lightweight dan tanpa dependency berat
+- Mudah diintegrasikan ke PPOB dan payment flow
+
+---
+
+## Why This Package?
+
+QRIS menggunakan format EMVCo TLV yang:
+- Panjang dan sulit dibaca secara manual
+- Rentan error parsing
+- Wajib divalidasi CRC sebelum diproses
+
+Package ini dibuat untuk:
+- Menghemat waktu parsing QRIS
+- Menghindari bug pembayaran
+- Mempermudah validasi QR sebelum diproses ke payment gateway
+
+---
+
+## Installation
+
+Tambahkan ke `pubspec.yaml`:
+
+```yaml
+dependencies:
+  qris_parser: ^1.0.0
+```
+
+Lalu jalankan:
+
+```bash
+flutter pub get
+```
+
+---
 
 ## Usage
 
-Here is a simple example of how to use the package.
+### Basic Parsing
 
 ```dart
 import 'package:qris_parser/qris_parser.dart';
 
 void main() {
-  // Example: "Fulung Store" QRIS
-  String qrisData = '00020101021126570011ID.DANA.WWW011893600915387258349102098725834910303UMI51440014ID.CO.QRIS.WWW0215ID10253905048490303UMI5204481453033605802ID5912Fulung Store6014Kota Palembang61053011163047279';
+  final qrisString = '00020101021226610016ID.CO.QRIS.WWW...';
 
-  try {
-    // Parse the data
-    Qris qris = Qris.parse(qrisData);
+  final result = QrisParser.parse(qrisString);
 
-    // Access the properties
-    print('Merchant Name: ${qris.merchantName}');
-    // Output: Fulung Store
-
-    print('City: ${qris.merchantCity}');
-    // Output: Kota Palembang
-
-    print('CRC: ${qris.crc}');
-    // Output: 7279
-
-    // Check specific merchant account info (e.g. ID 26)
-    if (qris.merchantAccountInformation.containsKey(26)) {
-       print('Merchant Criteria: ${qris.merchantAccountInformation[26]?.criteria}');
-    }
-
-  } on QrisError catch (e) {
-    print('Failed to parse: $e');
+  if (result.isValid) {
+    print('Merchant Name : ${result.merchantName}');
+    print('Merchant City : ${result.merchantCity}');
+    print('Amount        : ${result.amount}');
+    print('CRC Valid     : ${result.isCrcValid}');
+  } else {
+    print('Invalid QRIS');
   }
 }
 ```
 
-## Flutter Integration
+---
 
-This package is **pure Dart**, which means it works seamlessly with Flutter. You typically use it alongside a QR scanning library (such as `mobile_scanner` or `qr_code_scanner`).
+## Parsed Data Example
 
-### Example with `mobile_scanner`
-
-```dart
-MobileScanner(
-  onDetect: (capture) {
-    final List<Barcode> barcodes = capture.barcodes;
-    for (final barcode in barcodes) {
-      if (barcode.rawValue != null) {
-        try {
-          // Parse the QRIS string from the scanner
-          final qris = Qris.parse(barcode.rawValue!);
-
-          // Data is valid Navigate to payment screen
-          Navigator.push(context, MaterialPageRoute(
-            builder: (context) => PaymentScreen(
-              merchantName: qris.merchantName,
-              amount: qris.transactionAmount,
-            )
-          ));
-
-        } on QrisError catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Invalid QRIS Code!')),
-          );
-        }
-      }
-    }
-  },
-)
-```
-
-## Reading from Image File/Gallery
-
-If you need to scan a QRIS code from an image file (e.g., from the gallery), you can use plugins like `mobile_scanner` or `google_ml_kit`.
-
-```dart
-// Pseudo-code example using file picker and scanner
-Future<void> scanFromGallery() async {
-  final file = await FilePicker.platform.pickFiles();
-  if (file != null) {
-    // Use your preferred scanner library's 'analyzeImage' function
-    final String? code = await scanner.analyzeImage(file.files.single.path!);
-
-    if (code != null) {
-      final qris = Qris.parse(code);
-      print(qris.merchantName);
-    }
-  }
+```json
+{
+  "merchantName": "TOKO MAJU JAYA",
+  "merchantCity": "JAKARTA",
+  "merchantCategoryCode": "5411",
+  "transactionAmount": 10000,
+  "countryCode": "ID",
+  "currency": "IDR",
+  "crcValid": true
 }
 ```
 
-## Supported Fields
+---
 
-The parser currently supports extracting the following standard fields:
+## Parsed Fields
 
-- **Payload Format Indicator** (ID 00)
-- **Point of Initiation Method** (ID 01)
-- **Merchant Account Information** (ID 26-51)
-- **Merchant Category Code** (ID 52)
-- **Transaction Currency** (ID 53)
-- **Transaction Amount** (ID 54)
-- **Tip/Convenience Indicator** (ID 55)
-- **Fees** (ID 56, 57)
-- **Country Code** (ID 58)
-- **Merchant Name** (ID 59)
-- **Merchant City** (ID 60)
-- **Postal Code** (ID 61)
-- **Additional Data Field** (ID 62)
-- **CRC** (ID 63)
+| Field | Description |
+|------|------------|
+| Merchant Name | Nama merchant |
+| Merchant City | Kota merchant |
+| MCC | Merchant Category Code |
+| Transaction Amount | Nominal pembayaran |
+| Country Code | ID |
+| Currency | IDR |
+| CRC | Validasi checksum |
 
-## TO-DOs
+---
 
-- [ ] Add more helper getters for specific merchant criteria.
-- [ ] Add support for generating QRIS strings (Builder pattern).
-- [ ] Improve error messages with more context.
+## CRC Validation
+
+Validasi CRC dilakukan otomatis saat parsing.
+
+```dart
+if (result.isCrcValid) {
+  // QRIS valid dan aman diproses
+}
+```
+
+---
+
+## Use Cases
+
+- PPOB App
+- QRIS Payment Gateway
+- Backend validation service
+- QRIS scanner app
+- Payment simulator
+- Fraud prevention
+
+---
+
+## Notes
+
+- Package ini tidak melakukan pembayaran
+- Hanya parsing dan validasi struktur QRIS
+- Pastikan tetap mengikuti regulasi BI dan payment gateway masing-masing
+
+---
+
+## Roadmap
+
+- Support QRIS CPM
+- Support custom EMV tag
+- Error detail dan debug mode
+- Go dan Node.js version
+- QRIS simulator
+
+---
+
+## Contributing
+
+Contributions are welcome.
+
+1. Fork repository
+2. Create feature branch
+3. Commit changes
+4. Open Pull Request
+
+---
 
 ## License
 
-MIT
+MIT License  
+Free to use for personal and commercial projects.
+
+---
+
+## Support
+
+Jika package ini membantu:
+- Beri star di GitHub
+- Laporkan bug via Issues
+- Kirim ide atau improvement
