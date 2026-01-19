@@ -1,46 +1,46 @@
 # QRIS Parser (Dart / Flutter)
 
-**QRIS Parser** adalah package Dart untuk mem-parsing string QRIS (EMVCo) menjadi data terstruktur, lengkap dengan validasi CRC, sehingga aman digunakan untuk aplikasi payment, PPOB, e-wallet, dan backend validation.
+QRIS Parser is a Dart package for parsing **QRIS (EMVCo) strings** into structured data with **CRC validation**, making it safe to use for payment applications, PPOB systems, e-wallets, and backend validation services.
 
-Package ini dibuat khusus untuk developer Indonesia yang berurusan dengan QRIS, payment gateway, dan sistem pembayaran digital.
+This package is designed for developers working with QRIS and digital payment systems, especially in Indonesia.
 
 ---
 
 ## Features
 
-- Parse QRIS string ke struktur data
-- Validasi CRC (EMVCo compliant)
-- Support QRIS statis dan dinamis
-- Compatible dengan Flutter dan Dart backend
-- Lightweight dan tanpa dependency berat
-- Mudah diintegrasikan ke PPOB dan payment flow
+- Parse QRIS strings into structured data
+- EMVCo-compliant CRC validation
+- Supports static and dynamic QRIS
+- Compatible with Flutter and Dart backend
+- Lightweight with no heavy dependencies
+- Easy integration with PPOB and payment flows
 
 ---
 
 ## Why This Package?
 
-QRIS menggunakan format EMVCo TLV yang:
-- Panjang dan sulit dibaca secara manual
-- Rentan error parsing
-- Wajib divalidasi CRC sebelum diproses
+QRIS uses the **EMVCo TLV** format which is:
+- Long and hard to read manually
+- Error-prone when parsed incorrectly
+- Required to be CRC-validated before processing
 
-Package ini dibuat untuk:
-- Menghemat waktu parsing QRIS
-- Menghindari bug pembayaran
-- Mempermudah validasi QR sebelum diproses ke payment gateway
+This package helps:
+- Reduce QRIS parsing complexity
+- Prevent payment-related bugs
+- Safely validate QRIS before sending to a payment gateway
 
 ---
 
 ## Installation
 
-Tambahkan ke `pubspec.yaml`:
+Add this to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
   qris_parser: ^1.0.1
 ```
 
-Lalu jalankan:
+Then run:
 
 ```bash
 flutter pub get
@@ -93,23 +93,23 @@ void main() {
 
 | Field | Description |
 |------|------------|
-| Merchant Name | Nama merchant |
-| Merchant City | Kota merchant |
+| Merchant Name | Merchant name |
+| Merchant City | Merchant city |
 | MCC | Merchant Category Code |
-| Transaction Amount | Nominal pembayaran |
-| Country Code | ID |
-| Currency | IDR |
-| CRC | Validasi checksum |
+| Transaction Amount | Payment amount |
+| Country Code | Country code |
+| Currency | Currency |
+| CRC | Checksum validation |
 
 ---
 
 ## CRC Validation
 
-Validasi CRC dilakukan otomatis saat parsing.
+CRC validation is performed automatically during parsing.
 
 ```dart
 if (result.isCrcValid) {
-  // QRIS valid dan aman diproses
+  // QRIS is valid and safe to process
 }
 ```
 
@@ -117,30 +117,30 @@ if (result.isCrcValid) {
 
 ## Use Cases
 
-- PPOB App
-- QRIS Payment Gateway
-- Backend validation service
-- QRIS scanner app
-- Payment simulator
-- Fraud prevention
+- PPOB applications
+- QRIS payment gateways
+- Backend validation services
+- QRIS scanner applications
+- Payment simulators
+- Fraud prevention systems
 
 ---
 
 ## Notes
 
-- Package ini tidak melakukan pembayaran
-- Hanya parsing dan validasi struktur QRIS
-- Pastikan tetap mengikuti regulasi BI dan payment gateway masing-masing
+- This package does not perform payments
+- It only parses and validates QRIS structures
+- Always comply with local regulations and payment gateway requirements
 
 ---
 
 ## Roadmap
 
-- Support QRIS CPM
-- Support custom EMV tag
-- Error detail dan debug mode
-- Go dan Node.js version
-- QRIS simulator
+- Support for QRIS CPM
+- Custom EMV tag support
+- Detailed error handling and debug mode
+- Go and Node.js versions
+- QRIS payment simulator
 
 ---
 
@@ -148,10 +148,10 @@ if (result.isCrcValid) {
 
 Contributions are welcome.
 
-1. Fork repository
-2. Create feature branch
-3. Commit changes
-4. Open Pull Request
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Open a Pull Request
 
 ---
 
@@ -162,9 +162,56 @@ Free to use for personal and commercial projects.
 
 ---
 
-## Support
+---
 
-Jika package ini membantu:
-- Beri star di GitHub
-- Laporkan bug via Issues
-- Kirim ide atau improvement
+# Dokumentasi Bahasa Indonesia
+
+QRIS Parser adalah package Dart untuk mem-parsing string QRIS (EMVCo) menjadi data terstruktur dengan validasi CRC, sehingga aman digunakan untuk aplikasi payment, PPOB, e-wallet, dan backend validation.
+
+---
+
+## Fitur
+
+- Parsing QRIS ke struktur data
+- Validasi CRC sesuai standar EMVCo
+- Mendukung QRIS statis dan dinamis
+- Kompatibel dengan Flutter dan backend Dart
+- Ringan tanpa dependency berat
+- Mudah diintegrasikan ke sistem PPOB
+
+---
+
+## Instalasi
+
+Tambahkan ke `pubspec.yaml`:
+
+```yaml
+dependencies:
+  qris_parser: ^1.0.1
+```
+
+Kemudian jalankan:
+
+```bash
+flutter pub get
+```
+
+---
+
+## Contoh Penggunaan
+
+```dart
+final result = QrisParser.parse(qrisString);
+
+if (result.isValid) {
+  print(result.merchantName);
+}
+```
+
+---
+
+## Catatan
+
+- Package ini tidak melakukan proses pembayaran
+- Hanya parsing dan validasi struktur QRIS
+- Pastikan mematuhi regulasi Bank Indonesia dan payment gateway terkait
