@@ -27,7 +27,7 @@ QRIS uses the **EMVCo TLV** format which is:
 This package helps:
 - Reduce QRIS parsing complexity
 - Prevent payment-related bugs
-- Safely validate QRIS before sending to a payment gateway
+- Safely validate QRIS before sending to a payment gateways
 
 ---
 
